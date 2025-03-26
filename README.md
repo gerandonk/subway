@@ -2,6 +2,7 @@
 
 Automatically create [Cloudflare Tunnels](https://www.cloudflare.com/products/tunnel/) and/or [Caddy](https://caddyserver.com/) as a reverse proxy for local access for Docker containers.
 
+Origin source: https://github.com/mikeburgh/subway
 Inspired by: https://github.com/aschzero/hera
 
 ## How It Works
@@ -30,6 +31,7 @@ It works, but it's rough (it's a bash script!), I built it for personal use, you
 | `CADDY_WILDCARD_DOMAIN` | To use a wild card domain set this to the domain, eg *.example.com Note: must also set CADDY_ACME_DNS to use wildcard domains for SSL |  
 | `CONNECT_NETWORKS` | Automatically connect Subway to networks the container is on to try and reach the services. Will only connect the network if initial attempt to connect to the container service fails. Set to true to enable. Note requires read/write access to the docker.sock |  
 | `EXTERNAL_SERVICES` | See [external services](#external-services) |  |
+| `TUNNEL_NAME` | Optional if you only running one tunnel and only work for 2nd realese. | subway  |
 
 
 ## Using with just cloudflare
@@ -41,7 +43,18 @@ docker run \
 	--name=Subway
 	-v /var/run/docker.sock:/var/run/docker.sock \
 	-v '/path/to/data':'/data':'rw' \
-	mikeburgh/subway:latest
+	gerandonk/subway:latest
+```
+
+for multyple tunnell or other machine with singgle domain:
+
+```bash
+docker run \
+	--name=Subway
+	-v /var/run/docker.sock:/var/run/docker.sock \
+	-v '/path/to/data':'/data':'rw' \
+	-e TUNNEL_NAME='second-tunnel' \
+	gerandonk/subway:2nd
 ```
 
 2. On first run check the docker logs for the authorization url, and copy it to a browser to complete authorization.
@@ -59,7 +72,7 @@ docker run \
 	-v '/path/to/data':'/data':'rw' \
 	-e SERVICES=caddy \
 	-e CADDY_ACME_DNS="cloudflare token" \
-	mikeburgh/subway:latest
+	gerandonk/subway:latest
 ```
 
 2. (optional, only required for dns SSL challenge when sites are not accessable over the internet). To get the value for the token and replace it in the variable above go to https://dash.cloudflare.com/profile/api-tokens and create a custom token with the following settings  
@@ -102,7 +115,7 @@ docker run \
 	-v /var/run/docker.sock:/var/run/docker.sock \
 	-v '/path/to/data':'/data':'rw' \
 	-e 'EXTERNAL_SERVICES'='[{ "hostname": "site1.example.com", "service": "http://10.1.1.1:8080" },{ "hostname": "site2.example.com", "service": "http://10.1.1.2:8080" }]'
-	mikeburgh/subway:latest
+	gerandonk/subway:latest
 ```
 
 ## Important notes
@@ -122,7 +135,14 @@ docker run \
 - 	Option to configure container for either cloudflare or caddy if both are used
 - 	Centralize EXTERNAL_SERVICES code out of service specific flies
 -   Support multiple domains (may require multiple tunnels)
+-   Now Support for arch linux/amd64,linux/arm64,linux/arm/v7 (im only test for amd64 and arm64)
 
 ## To Build
 
-docker build -t mikeburgh/subway:latest .
+docker build -t gerandonk/subway:latest .
+
+## :gift_heart: <b>Want to give me a Gift ?</b><br>
+
+If you happy and my build help you, give me a coffee .
+
+- :link: PAYPAL to https://paypal.me/sklitinov
